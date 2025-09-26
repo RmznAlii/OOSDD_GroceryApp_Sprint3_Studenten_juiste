@@ -10,35 +10,41 @@ namespace TestCore
         }
 
 
-        //Happy flow
+        // Happy flow
         [Test]
-        public void TestPasswordHelperReturnsTrue()
+        public void VerifyPassword_ReturnsTrue_ForSinglePair()
         {
-            string password = "user3";
-            string passwordHash = "sxnIcZdYt8wC8MYWcQVQjQ==.FKd5Z/jwxPv3a63lX+uvQ0+P7EuNYZybvkmdhbnkIHA=";
-            Assert.IsTrue(PasswordHelper.VerifyPassword(password, passwordHash));
+            string plain = "user3";
+            string hash  = "sxnIcZdYt8wC8MYWcQVQjQ==.FKd5Z/jwxPv3a63lX+uvQ0+P7EuNYZybvkmdhbnkIHA=";
+            Assert.IsTrue(PasswordHelper.VerifyPassword(plain, hash));
         }
 
+// Happy flow (meerdere paren)
         [TestCase("user1", "IunRhDKa+fWo8+4/Qfj7Pg==.kDxZnUQHCZun6gLIE6d9oeULLRIuRmxmH2QKJv2IM08=")]
         [TestCase("user3", "sxnIcZdYt8wC8MYWcQVQjQ==.FKd5Z/jwxPv3a63lX+uvQ0+P7EuNYZybvkmdhbnkIHA=")]
-        public void TestPasswordHelperReturnsTrue(string password, string passwordHash)
+        public void VerifyPassword_ReturnsTrue_ForKnownPairs(string plain, string hash)
         {
-            Assert.IsTrue(PasswordHelper.VerifyPassword(password, passwordHash));
+            Assert.IsTrue(PasswordHelper.VerifyPassword(plain, hash));
         }
 
-
-        //Unhappy flow
+// Unhappy flow 
         [Test]
-        public void TestPasswordHelperReturnsFalse()
+        public void VerifyPassword_ReturnsFalse_ForSingleWrongPair()
         {
-            Assert.Pass(); //Zelf uitwerken
+            string plain = "verkeerd";
+            string hash  = "sxnIcZdYt8wC8MYWcQVQjQ==.FKd5Z/jwxPv3a63lX+uvQ0+P7EuNYZybvkmdhbnkIHA=";
+            bool ok = PasswordHelper.VerifyPassword(plain, hash);
+            Assert.IsFalse(ok, "Het wachtwoord zou onjuist moeten zijn.");
         }
 
-        [TestCase("user1", "IunRhDKa+fWo8+4/Qfj7Pg==.kDxZnUQHCZun6gLIE6d9oeULLRIuRmxmH2QKJv2IM08")]
-        [TestCase("user3", "sxnIcZdYt8wC8MYWcQVQjQ==.FKd5Z/jwxPv3a63lX+uvQ0+P7EuNYZybvkmdhbnkIHA")]
-        public void TestPasswordHelperReturnsFalse(string password, string passwordHash)
+// Unhappy flow (meerdere foute paren)
+        [TestCase("verkeerd",       "sxnIcZdYt8wC8MYWcQVQjQ==.FKd5Z/jwxPv3a63lX+uvQ0+P7EuNYZybvkmdhbnkIHA=")]
+        [TestCase("foutwachtwoord", "IunRhDKa+fWo8+4/Qfj7Pg==.kDxZnUQHCZun6gLIE6d9oeULLRIuRmxmH2QKJv2IM08=")]
+        public void VerifyPassword_ReturnsFalse_ForInvalidPairs(string plain, string hash)
         {
-            Assert.Fail(); //Zelf uitwerken zodat de test slaagt!
+            bool ok = PasswordHelper.VerifyPassword(plain, hash);
+            Assert.IsFalse(ok, "Het wachtwoord zou onjuist moeten zijn.");
         }
+
     }
 }
