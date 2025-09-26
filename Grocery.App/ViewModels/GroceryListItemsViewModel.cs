@@ -5,6 +5,7 @@ using Grocery.App.Views;
 using Grocery.Core.Interfaces.Services;
 using Grocery.Core.Models;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace Grocery.App.ViewModels
@@ -24,10 +25,10 @@ namespace Grocery.App.ViewModels
         GroceryList groceryList = new(0, "None", DateOnly.MinValue, "", 0);
         [ObservableProperty]
         string myMessage;
-        
+
         [ObservableProperty]
         private string searchText;
-
+        
         public GroceryListItemsViewModel(IGroceryListItemsService groceryListItemsService, IProductService productService, IFileSaverService fileSaverService)
         {
             _groceryListItemsService = groceryListItemsService;
@@ -47,6 +48,7 @@ namespace Grocery.App.ViewModels
         {
             AvailableProducts.Clear();
             allProducts.Clear();
+
             foreach (Product p in _productService.GetAll())
             {
                 if (MyGroceryListItems.FirstOrDefault(g => g.ProductId == p.Id) == null && p.Stock > 0)
@@ -95,6 +97,25 @@ namespace Grocery.App.ViewModels
                 await Toast.Make($"Opslaan mislukt: {ex.Message}").Show(cancellationToken);
             }
         }
+
+        [RelayCommand]
+        public void RemoveProduct(GroceryListItem item)
+        {
+            if (item == null) return;
+
+            var deleted = _groceryListItemsService.Delete(item.Id);
+            if (deleted == null) return;
+
+            // Linker lijst updaten
+            MyGroceryListItems.Remove(item);
+
+            // Rechter lijst + allProducts opnieuw samenstellen (stock is nu +1)
+            GetAvailableProducts();
+        }
+
+
+
+        
         [RelayCommand]
         private void SearchProducts(string searchTerm)
         {
@@ -113,6 +134,8 @@ namespace Grocery.App.ViewModels
                 foreach (var p in filtered) AvailableProducts.Add(p);
             }
         }
+
+
 
     }
 }
