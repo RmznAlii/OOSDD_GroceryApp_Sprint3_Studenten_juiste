@@ -34,19 +34,47 @@ namespace Grocery.Core.Services
             return _groceriesRepository.Add(item);
         }
 
-        public GroceryListItem? Delete(GroceryListItem item)
+        public GroceryListItem? Delete(int id)
         {
-            throw new NotImplementedException();
+            // 1) haal item op
+            var item = _groceriesRepository.Get(id);
+            if (item == null) return null;
+
+            // 2) verwijder item
+            var deleted = _groceriesRepository.Delete(id);
+            if (deleted == null) return null;
+
+            // 3) verhoog voorraad product
+            var product = _productRepository.Get(item.ProductId);
+            if (product != null)
+            {
+                product.Stock++;
+                _productRepository.Update(product);
+            }
+
+            // 4) vul productreferentie voor retourwaarde
+            deleted.Product = product ?? new(0, "", 0);
+            return deleted;
         }
 
         public GroceryListItem? Get(int id)
         {
-            throw new NotImplementedException();
+            var item = _groceriesRepository.Get(id);
+            if (item != null)
+            {
+                item.Product = _productRepository.Get(item.ProductId) ?? new(0, "", 0);
+            }
+            return item;
         }
 
         public GroceryListItem? Update(GroceryListItem item)
         {
-            throw new NotImplementedException();
+            var updated = _groceriesRepository.Update(item);
+            if (updated != null)
+            {
+                updated.Product = _productRepository.Get(updated.ProductId) ?? new(0, "", 0);
+            }
+            return updated;
         }
 
         private void FillService(List<GroceryListItem> groceryListItems)

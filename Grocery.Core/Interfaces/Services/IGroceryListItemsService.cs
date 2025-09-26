@@ -1,5 +1,4 @@
-﻿
-using Grocery.Core.Models;
+﻿using Grocery.Core.Models;
 
 namespace Grocery.Core.Interfaces.Services
 {
@@ -11,7 +10,7 @@ namespace Grocery.Core.Interfaces.Services
 
         public GroceryListItem Add(GroceryListItem item);
 
-        public GroceryListItem? Delete(GroceryListItem item);
+        public GroceryListItem? Delete(int id);
 
         public GroceryListItem? Get(int id);
 
